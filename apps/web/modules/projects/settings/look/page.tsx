@@ -3,7 +3,6 @@ import { cn } from "@/lib/cn";
 import { IS_STORAGE_CONFIGURED, SURVEY_BG_COLORS, UNSPLASH_ACCESS_KEY } from "@/lib/constants";
 import { getPublicDomain } from "@/lib/getPublicUrl";
 import { getTranslate } from "@/lingodotdev/server";
-import { getRemoveBrandingPermission } from "@/modules/ee/license-check/lib/utils";
 import { BrandingSettingsCard } from "@/modules/ee/whitelabel/remove-branding/components/branding-settings-card";
 import { getEnvironmentAuth } from "@/modules/environments/lib/utils";
 import { ProjectConfigNavigation } from "@/modules/projects/settings/components/project-config-navigation";
@@ -19,7 +18,7 @@ export const ProjectLookSettingsPage = async (props: { params: Promise<{ environ
   const params = await props.params;
   const t = await getTranslate();
 
-  const { isReadOnly, organization } = await getEnvironmentAuth(params.environmentId);
+  const { isReadOnly } = await getEnvironmentAuth(params.environmentId);
 
   const project = await getProjectByEnvironmentId(params.environmentId);
 
@@ -27,7 +26,6 @@ export const ProjectLookSettingsPage = async (props: { params: Promise<{ environ
     throw new Error("Project not found");
   }
 
-  const canRemoveBranding = await getRemoveBrandingPermission(organization.billing.plan);
   const publicDomain = getPublicDomain();
 
   return (
@@ -71,9 +69,7 @@ export const ProjectLookSettingsPage = async (props: { params: Promise<{ environ
       </SettingsCard>
 
       <BrandingSettingsCard
-        canRemoveBranding={canRemoveBranding}
         project={project}
-        environmentId={params.environmentId}
         isReadOnly={isReadOnly}
       />
     </PageContentWrapper>

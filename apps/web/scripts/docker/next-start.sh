@@ -48,7 +48,7 @@ run_with_timeout() {
 
 
 echo "🗃️ Running database migrations..."
-run_with_timeout 300 "database migration" sh -c '(cd packages/database && npm run db:migrate:deploy)'
+run_with_timeout 300 "database migration" npx prisma migrate deploy --schema ./packages/database/schema.prisma
 
 echo "🗃️ Running SAML database setup..."
 run_with_timeout 60 "SAML database setup" sh -c '(cd packages/database && npm run db:create-saml-database:deploy)'

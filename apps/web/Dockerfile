@@ -63,11 +63,15 @@ RUN pnpm build --filter=@formbricks/database
 
 # Build the project using our secret reader script
 # This mounts the secrets only during this build step without storing them in layers
-RUN --mount=type=secret,id=database_url \
-    --mount=type=secret,id=encryption_key \
-    --mount=type=secret,id=redis_url \
-    --mount=type=secret,id=sentry_auth_token \
-    /tmp/read-secrets.sh pnpm build --filter=@formbricks/web...
+# Add dummy environment variables for build
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/formbricks"
+ENV ENCRYPTION_KEY="12345678901234567890123456789012"
+ENV REDIS_URL="redis://localhost:6379"
+ENV NEXTAUTH_SECRET="12345678901234567890123456789012"
+ENV NEXTAUTH_URL="http://localhost:3000"
+ENV WEBAPP_URL="http://localhost:3000"
+
+RUN pnpm build --filter=@formbricks/web...
 
 # Extract Prisma version
 RUN jq -r '.devDependencies.prisma' packages/database/package.json > /prisma_version.txt
@@ -132,7 +136,7 @@ RUN npm install -g prisma@6
 
 # Create a startup script to handle the conditional logic
 COPY --from=installer /app/apps/web/scripts/docker/next-start.sh /home/nextjs/start.sh
-RUN chown nextjs:nextjs /home/nextjs/start.sh && chmod +x /home/nextjs/start.sh
+RUN sed -i 's/\r$//' /home/nextjs/start.sh && chown nextjs:nextjs /home/nextjs/start.sh && chmod +x /home/nextjs/start.sh
 
 EXPOSE 3000
 ENV HOSTNAME="0.0.0.0"
