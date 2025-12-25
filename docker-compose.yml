@@ -248,6 +248,11 @@ services:
   formbricks:
     restart: always
     image: formbricks-local:latest
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_WEBAPP_URL: http://localhost:3000
     depends_on:
       - postgres
       - redis
