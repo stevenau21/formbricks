@@ -66,3 +66,28 @@ If you have surveys on your laptop that you want to move to the cloud:
 *   [ ] **DNS Update**: Update your DNS provider (e.g., GoDaddy, Cloudflare) with the CNAME record provided by Railway.
 *   [ ] **SMTP (Optional)**: If you want to send email invites, add `SMTP_HOST`, `SMTP_USER`, etc., to the Variables tab.
 *   [ ] **Verification**: Open the link on an **iPhone** and an **Android** phone. (The white screen should be 100% gone!)
+
+---
+
+## 💾 Local Backup Strategy (Own Your Data)
+To ensure you never lose your data and have a copy on your own hardware:
+
+### Option 1: Periodic Manual Backup
+Run this command from your laptop once a week:
+```powershell
+# 1. Capture the cloud data into a file
+# Run this if you have the Railway CLI installed
+railway db dump > backup_$(Get-Date -Format "yyyyMMdd").sql
+
+# 2. To restore this to your local Docker DB for analysis:
+cat your_backup_file.sql | docker exec -i formbricks-db psql -U postgres
+```
+
+### Option 2: Automated "Cloud-to-Local" Sync (The Pro Way)
+You can use n8n (running in your Railway project) to keep your laptop updated automatically.
+1.  **Expose Local DB**: Create a Cloudflare Tunnel specifically for your local Postgres port (5432).
+2.  **n8n Workflow**:
+    *   **Trigger**: Every 24 hours.
+    *   **Source**: Postgres Node (Railway DB).
+    *   **Destination**: Postgres Node (Local Tunnel URL).
+3.  **Result**: Every night, n8n moves new responses from the cloud to your laptop. Even if you cancel Railway, you have the data!
