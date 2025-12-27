@@ -21,6 +21,13 @@ export const ProjectConfigNavigation = ({
 
   let navigation = [
     {
+      id: "backup",
+      label: "Backup",
+      icon: <BlocksIcon className="h-5 w-5" />,
+      href: `/environments/${environmentId}/project/backup`,
+      current: pathname?.includes("/backup"),
+    },
+    {
       id: "general",
       label: t("common.general"),
       icon: <UsersIcon className="h-5 w-5" />,
@@ -47,13 +54,6 @@ export const ProjectConfigNavigation = ({
       icon: <BlocksIcon className="h-5 w-5" />,
       href: `/environments/${environmentId}/project/integrations`,
       current: pathname?.includes("/integrations"),
-    },
-    {
-      id: "backup",
-      label: "Backup",
-      icon: <BlocksIcon className="h-5 w-5" />,
-      href: `/environments/${environmentId}/project/backup`,
-      current: pathname?.includes("/backup"),
     },
     {
       id: "teams",

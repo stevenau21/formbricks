@@ -16,10 +16,10 @@ interface SecondaryNavbarProps {
 export const SecondaryNavigation = ({ navigation, activeId, loading, ...props }: SecondaryNavbarProps) => {
   return (
     <div {...props}>
-      <nav className="flex h-10 w-full items-center space-x-4" aria-label="Tabs">
+      <nav className="no-scrollbar flex h-10 w-full items-center space-x-4 overflow-x-auto" aria-label="Tabs">
         {loading
           ? navigation.map((navElem) => (
-              <div className="group flex h-full flex-col truncate" key={navElem.id}>
+              <div className="group flex h-full shrink-0 flex-col truncate" key={navElem.id}>
                 <div
                   aria-disabled="true"
                   className={cn(
@@ -42,7 +42,7 @@ export const SecondaryNavigation = ({ navigation, activeId, loading, ...props }:
           : navigation.map(
               (navElem) =>
                 !navElem.hidden && (
-                  <div className="group flex h-full flex-col truncate" key={navElem.id}>
+                  <div className="group flex h-full shrink-0 flex-col truncate" key={navElem.id}>
                     {navElem.href ? (
                       <Link
                         href={navElem.href}

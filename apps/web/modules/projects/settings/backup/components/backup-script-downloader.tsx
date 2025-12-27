@@ -6,46 +6,57 @@ import { Button } from "@/modules/ui/components/button";
 const BACKUP_SCRIPT = `$ErrorActionPreference = "Stop"
 $backupDir = Join-Path $PSScriptRoot "backups"
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
-$backupFile = "formbricks_backup_$timestamp.sql"
-$containerName = "formbricks-postgres-1"
+$backupName = "formbricks_backup_$timestamp"
+$tempBackupDir = Join-Path $backupDir $backupName
+$zipFile = "$tempBackupDir.zip"
+
+$postgresContainer = "formbricks-postgres-1"
+$minioContainer = "formbricks-minio-1"
 $dbUser = "postgres"
 $dbName = "formbricks"
 
-# Create backup directory if it doesn't exist
+# Create backup directory
 if (-not (Test-Path $backupDir)) {
     New-Item -ItemType Directory -Path $backupDir | Out-Null
-    Write-Host "Created backup directory at $backupDir" -ForegroundColor Gray
 }
+New-Item -ItemType Directory -Path $tempBackupDir | Out-Null
 
-Write-Host "⏳ Starting backup of Formbricks database..." -ForegroundColor Cyan
+Write-Host "⏳ Starting full backup (DB + Files)..." -ForegroundColor Cyan
 
 try {
-    # Check if container is running
-    $containerStatus = docker inspect -f '{{.State.Running}}' $containerName 2>$null
-    if ($containerStatus -ne 'true') {
-        throw "Container '$containerName' is not running. Please start Docker first."
+    # Check containers
+    foreach ($c in @($postgresContainer, $minioContainer)) {
+        $status = docker inspect -f '{{.State.Running}}' $c 2>$null
+        if ($status -ne 'true') { throw "Container '$c' is not running." }
     }
 
-    # 1. Generate dump inside the container (avoids PowerShell encoding issues)
-    Write-Host "   Generating dump file..." -NoNewline
-    docker exec $containerName pg_dump -U $dbUser -d $dbName -f "/tmp/$backupFile"
+    # 1. Database Dump
+    Write-Host "   Backing up Database..." -NoNewline
+    docker exec $postgresContainer pg_dump -U $dbUser -d $dbName -f "/tmp/dump.sql"
+    docker cp "$postgresContainer\`:/tmp/dump.sql" "$tempBackupDir\\database.sql"
+    docker exec $postgresContainer rm "/tmp/dump.sql"
     Write-Host " Done." -ForegroundColor Green
 
-    # 2. Copy file from container to host
-    Write-Host "   Copying to host..." -NoNewline
-    docker cp "$containerName\`:/tmp/$backupFile" "$backupDir\$backupFile"
+    # 2. MinIO Files
+    Write-Host "   Backing up File Uploads..." -NoNewline
+    docker cp "$minioContainer\`:/data" "$tempBackupDir\\minio-data"
     Write-Host " Done." -ForegroundColor Green
 
-    # 3. Clean up temp file in container
-    docker exec $containerName rm "/tmp/$backupFile"
+    # 3. Zip it up
+    Write-Host "   Compressing archive..." -NoNewline
+    Compress-Archive -Path "$tempBackupDir\\*" -DestinationPath $zipFile
+    Write-Host " Done." -ForegroundColor Green
+
+    # Cleanup temp folder
+    Remove-Item -Path $tempBackupDir -Recurse -Force
 
     Write-Host ""
     Write-Host "✅ Backup successful!" -ForegroundColor Green
-    Write-Host "📂 Location: $backupDir\$backupFile" -ForegroundColor White
+    Write-Host "📂 File: $zipFile" -ForegroundColor White
 }
 catch {
-    Write-Host ""
     Write-Error "❌ Backup failed: $_"
+    if (Test-Path $tempBackupDir) { Remove-Item -Path $tempBackupDir -Recurse -Force }
     Read-Host "Press Enter to exit..."
 }
 
@@ -71,19 +82,20 @@ export const BackupScriptDownloader = () => {
   const handleRestoreDownload = () => {
     const restoreScript = `$ErrorActionPreference = "Stop"
 $backupDir = Join-Path $PSScriptRoot "backups"
-$containerName = "formbricks-postgres-1"
+$postgresContainer = "formbricks-postgres-1"
+$minioContainer = "formbricks-minio-1"
 $dbUser = "postgres"
 $dbName = "formbricks"
 
-Write-Host "⚠️  WARNING: This will OVERWRITE the current database with a backup." -ForegroundColor Yellow
-Write-Host "Make sure you have a backup of the current state before proceeding." -ForegroundColor Yellow
+Write-Host "⚠️  WARNING: This will OVERWRITE the current database AND file uploads." -ForegroundColor Yellow
+Write-Host "Make sure you have a backup of the current state." -ForegroundColor Yellow
 Write-Host ""
 
-# List available backups
-$backups = Get-ChildItem -Path $backupDir -Filter "*.sql" | Sort-Object LastWriteTime -Descending
+# List zip backups
+$backups = Get-ChildItem -Path $backupDir -Filter "*.zip" | Sort-Object LastWriteTime -Descending
 
 if ($backups.Count -eq 0) {
-    Write-Error "No backup files found in $backupDir"
+    Write-Error "No .zip backup files found in $backupDir"
     exit
 }
 
@@ -106,18 +118,43 @@ if ($selection -match "^\\d+$" -and [int]$selection -lt $backups.Count) {
     }
 
     try {
-        Write-Host "⏳ Restoring database..." -ForegroundColor Cyan
+        Write-Host "⏳ Restoring..." -ForegroundColor Cyan
         
-        # Copy backup to container
-        docker cp $selectedFile.FullName "$containerName\`:/tmp/restore.sql"
+        $tempDir = Join-Path $backupDir "restore_temp"
+        if (Test-Path $tempDir) { Remove-Item -Path $tempDir -Recurse -Force }
+        New-Item -ItemType Directory -Path $tempDir | Out-Null
 
-        # Run psql to restore
-        docker exec $containerName psql -U $dbUser -d $dbName -f "/tmp/restore.sql"
+        # 1. Extract
+        Write-Host "   Extracting archive..." -NoNewline
+        Expand-Archive -Path $selectedFile.FullName -DestinationPath $tempDir -Force
+        Write-Host " Done." -ForegroundColor Green
+
+        # 2. Restore DB
+        if (Test-Path "$tempDir\\database.sql") {
+            Write-Host "   Restoring Database..." -NoNewline
+            docker cp "$tempDir\\database.sql" "$postgresContainer\`:/tmp/restore.sql"
+            docker exec $postgresContainer psql -U $dbUser -d $dbName -f "/tmp/restore.sql"
+            docker exec $postgresContainer rm "/tmp/restore.sql"
+            Write-Host " Done." -ForegroundColor Green
+        }
+
+        # 3. Restore MinIO
+        if (Test-Path "$tempDir\\minio-data") {
+            Write-Host "   Restoring Files..." -NoNewline
+            $buckets = Get-ChildItem -Path "$tempDir\\minio-data" -Directory
+            foreach ($bucket in $buckets) {
+                 docker cp "$($bucket.FullName)" "$minioContainer\`:/data/"
+            }
+            if (Test-Path "$tempDir\\minio-data\\.minio.sys") {
+                docker cp "$tempDir\\minio-data\\.minio.sys" "$minioContainer\`:/data/"
+            }
+            Write-Host " Done." -ForegroundColor Green
+        }
 
         # Cleanup
-        docker exec $containerName rm "/tmp/restore.sql"
+        Remove-Item -Path $tempDir -Recurse -Force
 
-        Write-Host "✅ Restore completed successfully!" -ForegroundColor Green
+        Write-Host "✅ Restore completed!" -ForegroundColor Green
     }
     catch {
         Write-Error "❌ Restore failed: $_"

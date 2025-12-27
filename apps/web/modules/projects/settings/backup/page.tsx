@@ -7,6 +7,7 @@ import { BackupScriptDownloader } from "./components/backup-script-downloader";
 
 export const BackupSettingsPage = async (props: { params: Promise<{ environmentId: string }> }) => {
   const params = await props.params;
+  console.log("Rendering BackupSettingsPage for environment:", params.environmentId);
   const t = await getTranslate();
 
   return (

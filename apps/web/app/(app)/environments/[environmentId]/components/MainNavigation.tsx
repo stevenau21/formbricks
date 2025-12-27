@@ -4,6 +4,7 @@ import {
   ArrowUpRightIcon,
   ChevronRightIcon,
   Cog,
+  Database,
   LogOutIcon,
   MessageCircle,
   PanelLeftCloseIcon,
@@ -117,6 +118,12 @@ export const MainNavigation = ({
         icon: Cog,
         isActive: pathname?.includes("/project"),
       },
+      {
+        name: "Backup",
+        href: `/environments/${environment.id}/project/backup`,
+        icon: Database,
+        isActive: pathname?.includes("/project/backup"),
+      },
     ],
     [t, environment.id, pathname]
   );
@@ -185,7 +192,7 @@ export const MainNavigation = ({
                 size="icon"
                 onClick={toggleSidebar}
                 className={cn(
-                  "rounded-xl bg-slate-50 p-1 text-slate-600 transition-all hover:bg-slate-100 focus:outline-none focus:ring-0 focus:ring-transparent"
+                  "rounded-xl bg-slate-50 p-1 text-slate-600 transition-all hover:bg-slate-100 focus:ring-0 focus:ring-transparent focus:outline-none"
                 )}>
                 {isCollapsed ? (
                   <PanelLeftOpenIcon strokeWidth={1.5} />
