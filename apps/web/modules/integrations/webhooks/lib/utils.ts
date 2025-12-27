@@ -7,8 +7,8 @@ export const validWebHookURL = (urlInput: string) => {
   try {
     const url = new URL(trimmedInput);
 
-    if (url.protocol !== "https:") {
-      return { valid: false, error: "URL must start with https://" };
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return { valid: false, error: "URL must start with https:// or http://" };
     }
 
     const domainError: string =
@@ -22,7 +22,8 @@ export const validWebHookURL = (urlInput: string) => {
       };
     }
 
-    const validDomainPattern = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // Relaxed domain pattern to allow local hostnames without dots (e.g., n8n, host.docker.internal)
+    const validDomainPattern = /^[a-zA-Z0-9.-]+$/;
     if (!validDomainPattern.test(url.hostname)) {
       return {
         valid: false,

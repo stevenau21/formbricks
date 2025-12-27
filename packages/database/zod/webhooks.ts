@@ -19,7 +19,7 @@ export const ZWebhook = z.object({
     description: "The date and time the webhook was last updated",
     example: "2021-01-01T00:00:00.000Z",
   }),
-  url: z.string().url().openapi({
+  url: z.string().openapi({
     description: "The URL of the webhook",
   }),
   source: z.enum(["user", "zapier", "make", "n8n"]).openapi({

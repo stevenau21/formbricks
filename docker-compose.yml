@@ -99,7 +99,7 @@ x-environment: &environment
     S3_SECRET_KEY: minioadmin
     S3_REGION: us-east-1
     S3_BUCKET_NAME: formbricks
-    S3_ENDPOINT_URL: http://minio:9000
+    S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-http://localhost:9000}
     S3_FORCE_PATH_STYLE: 1
     ############################################# OPTIONAL (OAUTH CONFIGURATION) #############################################
 
@@ -258,6 +258,8 @@ services:
       - minio-setup
     ports:
       - 3000:3000
+    extra_hosts:
+      - "localhost:host-gateway"
     volumes:
       - ./saml-connection:/home/nextjs/apps/web/saml-connection
     <<: *environment
