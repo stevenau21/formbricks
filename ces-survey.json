@@ -1,0 +1,111 @@
+{
+  "autoClose": null,
+  "autoComplete": null,
+  "blocks": [
+    {
+      "elements": [
+        {
+          "headline": {
+            "default": "<p class=\"fb-editor-paragraph\"><b><strong class=\"fb-editor-text-bold\" style=\"\">Quann makes it easy for me to [ADD GOAL]</strong></b></p>"
+          },
+          "id": "gd7sgb0v5ukpswtubihwbzco",
+          "isColorCodingEnabled": false,
+          "lowerLabel": {
+            "default": "Disagree strongly"
+          },
+          "range": 5,
+          "required": true,
+          "scale": "number",
+          "type": "rating",
+          "upperLabel": {
+            "default": "Agree strongly"
+          }
+        }
+      ],
+      "id": "pvk68np686qpxa6q7zi6i5je",
+      "name": "Block 1"
+    },
+    {
+      "elements": [
+        {
+          "charLimit": {
+            "enabled": false
+          },
+          "headline": {
+            "default": "Thanks! How could we make it easier for you to [ADD GOAL]?"
+          },
+          "id": "emlkopd0tk1rg76i3lv2dobi",
+          "inputType": "text",
+          "placeholder": {
+            "default": "Type your answer here..."
+          },
+          "required": true,
+          "type": "openText"
+        }
+      ],
+      "id": "o6r3o5s16xj40gkphbkfq7wj",
+      "name": "Block 2"
+    }
+  ],
+  "createdAt": "2025-12-27T19:25:26.526Z",
+  "createdBy": "cmjoowzw10000r101oxaynapq",
+  "delay": 0,
+  "displayLimit": null,
+  "displayOption": "displayOnce",
+  "displayPercentage": null,
+  "endings": [
+    {
+      "buttonLabel": {
+        "default": "Create your own Survey"
+      },
+      "buttonLink": "https://formbricks.com",
+      "headline": {
+        "default": "Thank you!"
+      },
+      "id": "a8vt3x129qzogk0cezpcsw7r",
+      "subheader": {
+        "default": "We appreciate your feedback."
+      },
+      "type": "endScreen"
+    }
+  ],
+  "environmentId": "cmjoox8x50009r101ndv66bkz",
+  "hiddenFields": {
+    "enabled": false
+  },
+  "id": "cmjooxabi000er101ofthxco2",
+  "inlineTriggers": null,
+  "isBackButtonHidden": false,
+  "isSingleResponsePerEmailEnabled": false,
+  "isVerifyEmailEnabled": false,
+  "metadata": {},
+  "name": "CES Survey",
+  "pin": null,
+  "projectOverwrites": null,
+  "questions": [],
+  "recaptcha": {
+    "enabled": false,
+    "threshold": 0.1
+  },
+  "recontactDays": null,
+  "redirectUrl": null,
+  "segmentId": null,
+  "showLanguageSwitch": null,
+  "singleUse": {
+    "enabled": false,
+    "isEncrypted": true
+  },
+  "status": "inProgress",
+  "styling": {
+    "overwriteThemeStyling": true
+  },
+  "surveyClosedMessage": null,
+  "type": "link",
+  "updatedAt": "2025-12-27T19:25:32.741Z",
+  "variables": [],
+  "welcomeCard": {
+    "enabled": false,
+    "showResponseCount": false,
+    "timeToFinish": true
+  }
+}

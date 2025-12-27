@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist"
+  },
+  "extends": "../../packages/config-typescript/tsconfig.json",
+  "include": ["src"]
+}

@@ -48,6 +48,13 @@ export const OrganizationSettingsNavbar = ({
       hidden: !isOwner,
     },
     {
+      id: "backup",
+      label: "Backup",
+      href: `/environments/${environmentId}/settings/backup`,
+      current: pathname?.includes("/backup"),
+      hidden: false,
+    },
+    {
       id: "billing",
       label: t("common.billing"),
       href: `/environments/${environmentId}/settings/billing`,

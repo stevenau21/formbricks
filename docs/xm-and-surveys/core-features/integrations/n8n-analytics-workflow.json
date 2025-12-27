@@ -1,0 +1,100 @@
+{
+  "connections": {
+    "Postgres": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Respond to Webhook",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Postgres",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "name": "Formbricks Webhook to Analytics Storage",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {},
+        "path": "webhook-test/webhook",
+        "responseMode": "responseNode"
+      },
+      "position": [250, 300],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Formbricks DB"
+        }
+      },
+      "id": "postgres-insert",
+      "name": "Postgres",
+      "parameters": {
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event || $json.body?.event || 'unknown' }}",
+            "payload": "={{ JSON.stringify($json) }}",
+            "status": "success"
+          }
+        },
+        "operation": "insert",
+        "options": {
+          "returning": "all"
+        },
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "analytics_logs"
+        }
+      },
+      "position": [450, 300],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4
+    },
+    {
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true } }}"
+      },
+      "position": [650, 300],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-27T18:00:00.000Z",
+  "versionId": "1"
+}

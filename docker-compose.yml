@@ -206,6 +206,8 @@ services:
       # Postgres DB Super User Password
       # Replace the below with your own secure password & Make sure the password matches the password field in DATABASE_URL above
       - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
 
   # Redis/Valkey service for caching, rate limiting, and audit logging
   # Remove this service if you want to use an external Redis/Valkey instance

@@ -4731,7 +4731,51 @@ const supportiveWorkCulture = (t: TFunction): TTemplate => {
   );
 };
 
+const cesSurvey = (_t: TFunction): TTemplate => {
+  return {
+    name: "CES Survey",
+    description: "Texas Home Buying Strategic Blueprint",
+    role: "productManager",
+    channels: ["link"],
+    preset: {
+      name: "CES Survey",
+      welcomeCard: {
+        enabled: true,
+        headline: { default: "Your Texas Home Buying Strategic Blueprint" },
+        subheader: { default: "Whether you are buying your first home..." },
+        timeToFinish: true,
+        showResponseCount: false,
+      },
+      blocks: [
+        {
+          id: "yqa3gcplk6r6lqqll3gzrvwd",
+          name: "Block 1",
+          elements: [
+            {
+              id: "u1e4dpqk1siaxx2din68mmbf",
+              type: TSurveyElementTypeEnum.Consent,
+              label: {
+                default:
+                  "I have reviewed the Texas IABS and understand this is a strategic estimate, not a formal loan application.",
+              },
+              headline: { default: "Mandatory Texas Disclosures & Strategy Consent" },
+              required: false,
+              subheader: { default: "Texas law requires all real estate license holders..." },
+            },
+          ],
+          buttonLabel: { default: "" },
+          backButtonLabel: { default: "" },
+        },
+        // ... PASTE THE REST OF YOUR BLOCKS HERE ...
+      ],
+      endings: [],
+      hiddenFields: { enabled: false, fieldIds: [] },
+    },
+  };
+};
+
 export const templates = (t: TFunction): TTemplate[] => [
+  cesSurvey(t),
   cartAbandonmentSurvey(t),
   siteAbandonmentSurvey(t),
   productMarketFitSuperhuman(t),

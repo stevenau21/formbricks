@@ -981,3 +981,15 @@ model ProjectTeam {
   @@id([projectId, teamId])
   @@index([teamId])
 }
+
+model AnalyticsLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now()) @map("created_at")
+  event     String
+  payload   Json
+  status    String   @default("success")
+
+  @@index([event])
+  @@index([createdAt])
+  @@map("analytics_logs")
+}

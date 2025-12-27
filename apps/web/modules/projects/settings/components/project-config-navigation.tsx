@@ -49,6 +49,13 @@ export const ProjectConfigNavigation = ({
       current: pathname?.includes("/integrations"),
     },
     {
+      id: "backup",
+      label: "Backup",
+      icon: <BlocksIcon className="h-5 w-5" />,
+      href: `/environments/${environmentId}/project/backup`,
+      current: pathname?.includes("/backup"),
+    },
+    {
       id: "teams",
       label: t("common.team_access"),
       icon: <UsersIcon className="h-5 w-5" />,
