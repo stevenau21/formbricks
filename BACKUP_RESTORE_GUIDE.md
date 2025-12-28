@@ -33,20 +33,23 @@ The script saves the backup in **two locations** for safety:
 
 ## ♻️ How to Restore
 
+**Note:** You only need to download the `restore-db.ps1` script **ONCE**. If you already have it in your project folder, you can skip step 1.
+
 **Warning:** This will overwrite your current database with the backup.
 
-1.  Open PowerShell.
-2.  Navigate to the project folder:
+1.  **Get the Script (First Time Only):**
+    - If you don't have `restore-db.ps1` in your `C:\dev\projects\formbricks` folder, download it from the UI or save it manually.
+2.  Open PowerShell.
+3.  Navigate to the project folder:
     ```powershell
     cd C:\dev\projects\formbricks
     ```
-3.  Run the restore script:
+4.  Run the restore script:
     ```powershell
     .\restore-db.ps1
     ```
-4.  **Select a Backup:**
-    - The script will list all backups found in your project folder and Downloads folder.
-    - **Note:** You might see the same backup listed twice (once from `backups/` and once from `Downloads/`). This is normal. You can select either one.
+5.  **Select a Backup:**
+    - The script acts as a **Backup Browser**. It will search your folders and list every backup it finds.
     - Type the number (e.g., `0`) and press **Enter**.
 5.  **Confirm:**
     - Type `y` and press **Enter** to start the restore.

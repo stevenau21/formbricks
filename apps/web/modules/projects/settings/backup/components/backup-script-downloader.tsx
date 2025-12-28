@@ -349,9 +349,10 @@ Read-Host "Press Enter to exit..."`;
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-slate-900">1. Backup Script</h3>
+        <h3 className="text-sm font-medium text-slate-900">1. Backup Tool (Save Data)</h3>
         <p className="text-sm text-slate-600">
-          Download this PowerShell script and run it on your server to create a full database backup.
+          Download the <strong>backup-db.ps1</strong> script once. Run it in PowerShell (
+          <code>.\backup-db.ps1</code>) whenever you want to create a new backup zip.
         </p>
         <div className="rounded-md bg-slate-950 p-4">
           <pre className="overflow-x-auto text-xs text-slate-50">
@@ -365,25 +366,24 @@ Read-Host "Press Enter to exit..."`;
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-slate-900">2. Restore Script</h3>
-        <p className="text-sm text-slate-600">
-          To restore a backup:
-          <ol className="mt-2 list-decimal space-y-1 pl-5">
-            <li>
-              Download the <strong>restore-db.ps1</strong> script below.
-            </li>
-            <li>Run the script (Right-click &gt; Run with PowerShell).</li>
-            <li>
-              It will automatically find backups in your <strong>Downloads</strong> folder or the script
-              folder.
-            </li>
-          </ol>
-          <strong>Warning: This will overwrite your current database and files.</strong>
-        </p>
-        <Button onClick={handleRestoreDownload} variant="outline">
-          <DownloadIcon className="mr-2 h-4 w-4" />
-          Download restore-db.ps1
-        </Button>
+        <h3 className="text-sm font-medium text-slate-900">2. Restore Tool (Load Data)</h3>
+        <div className="text-sm text-slate-600">
+          <p>
+            Download the <strong>restore-db.ps1</strong> script once. Run it in PowerShell (
+            <code>.\restore-db.ps1</code>) to browse and load any of your previous backups.
+          </p>
+          <pre className="mt-2 rounded bg-slate-100 p-2 font-mono text-xs">.\restore-db.ps1</pre>
+          <p className="mt-2 font-medium text-amber-600">
+            Warning: This will overwrite your current database and files.
+          </p>
+        </div>
+        <div className="pt-2">
+          <p className="mb-2 text-xs text-slate-500">Don&apos;t have the script yet?</p>
+          <Button onClick={handleRestoreDownload} variant="outline" size="sm">
+            <DownloadIcon className="mr-2 h-4 w-4" />
+            Download restore-db.ps1
+          </Button>
+        </div>
       </div>
     </div>
   );
