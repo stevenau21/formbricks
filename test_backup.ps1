@@ -10,20 +10,6 @@ $minioContainer = "formbricks-minio-1"
 $dbUser = "postgres"
 $dbName = "formbricks"
 
-function Get-DownloadsDirectory {
-    try {
-        $shell = New-Object -ComObject Shell.Application
-        $downloads = $shell.NameSpace("shell:Downloads").Self.Path
-        if ($downloads -and (Test-Path $downloads)) {
-            return $downloads
-        }
-    } catch {
-        # ignore and fall back
-    }
-
-    return (Join-Path $env:USERPROFILE "Downloads")
-}
-
 # Create backup directory
 if (-not (Test-Path $backupDir)) {
     New-Item -ItemType Directory -Path $backupDir | Out-Null
@@ -41,9 +27,9 @@ try {
 
     # 1. Database Dump
     Write-Host "   Backing up Database..." -NoNewline
-    docker exec $postgresContainer pg_dump -U $dbUser -d $dbName -f "/tmp/database.sql"
-    docker cp "$postgresContainer`:/tmp/database.sql" "$tempBackupDir\database.sql"
-    docker exec $postgresContainer rm "/tmp/database.sql"
+    docker exec $postgresContainer pg_dump -U $dbUser -d $dbName -f "/tmp/dump.sql"
+    docker cp "$postgresContainer`:/tmp/dump.sql" "$tempBackupDir\database.sql"
+    docker exec $postgresContainer rm "/tmp/dump.sql"
     Write-Host " Done." -ForegroundColor Green
 
     # 2. MinIO Files
@@ -62,16 +48,9 @@ try {
     Write-Host ""
     Write-Host "Backup successful!" -ForegroundColor Green
     Write-Host "File: $zipFile" -ForegroundColor White
-
-    $downloadsDir = Get-DownloadsDirectory
-    if (Test-Path $downloadsDir) {
-        $copyTarget = Join-Path $downloadsDir (Split-Path -Leaf $zipFile)
-        Copy-Item -LiteralPath $zipFile -Destination $copyTarget -Force
-        Write-Host "Copied to Downloads: $copyTarget" -ForegroundColor White
-    }
 }
 catch {
-    Write-Error "Backup failed: $_"
+    Write-Error "❌ Backup failed: $_"
     if (Test-Path $tempBackupDir) { Remove-Item -Path $tempBackupDir -Recurse -Force }
     Read-Host "Press Enter to exit..."
 }
