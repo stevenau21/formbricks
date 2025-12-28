@@ -22,7 +22,7 @@ export const OrganizationSettingsNavbar = ({
   loading,
 }: OrganizationSettingsNavbarProps) => {
   const pathname = usePathname();
-  const { isMember, isOwner } = getAccessFlags(membershipRole);
+  const { isMember, isOwner, isManager } = getAccessFlags(membershipRole);
   const isPricingDisabled = isMember;
   const { t } = useTranslation();
 
@@ -53,6 +53,13 @@ export const OrganizationSettingsNavbar = ({
       href: `/environments/${environmentId}/settings/backup`,
       current: pathname?.includes("/backup"),
       hidden: false,
+    },
+    {
+      id: "smtp",
+      label: "SMTP",
+      href: `/environments/${environmentId}/settings/smtp`,
+      current: pathname?.includes("/smtp"),
+      hidden: !(isOwner || isManager),
     },
     {
       id: "billing",

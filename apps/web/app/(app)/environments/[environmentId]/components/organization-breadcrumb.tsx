@@ -145,6 +145,12 @@ export const OrganizationBreadcrumb = ({
       hidden: !isOwnerOrManager,
     },
     {
+      id: "smtp",
+      label: "SMTP",
+      href: `/environments/${currentEnvironmentId}/settings/smtp`,
+      hidden: !isOwnerOrManager,
+    },
+    {
       id: "billing",
       label: t("common.billing"),
       href: `/environments/${currentEnvironmentId}/settings/billing`,
