@@ -13,7 +13,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { TSurveyFollowUpAction, TSurveyFollowUpTrigger } from "@formbricks/database/types/survey-follow-up";
@@ -188,6 +188,8 @@ export const FollowUpModal = ({
       subject: defaultValues?.subject ?? t("environments.surveys.edit.follow_ups_modal_action_subject"),
       body: defaultValues?.body ?? getSurveyFollowUpActionDefaultBody(t),
       attachResponseData: defaultValues?.attachResponseData ?? false,
+      includeVariables: defaultValues?.includeVariables ?? false,
+      includeHiddenFields: defaultValues?.includeHiddenFields ?? false,
     },
     resolver: zodResolver(ZCreateSurveyFollowUpFormSchema),
     mode: "onChange",
@@ -196,6 +198,18 @@ export const FollowUpModal = ({
   const formErrors = form.formState.errors;
   const formSubmitting = form.formState.isSubmitting;
   const triggerType = form.watch("triggerType");
+  const handleInvalid = (errors: FieldErrors<TCreateSurveyFollowUpForm>) => {
+    const message =
+      errors.followUpName?.message ||
+      errors.emailTo?.message ||
+      errors.replyTo?.message ||
+      errors.subject?.message ||
+      errors.body?.message ||
+      errors.endingIds?.message ||
+      "Please check the highlighted fields.";
+
+    toast.error(message);
+  };
 
   const handleSubmit = (data: TCreateSurveyFollowUpForm) => {
     if (data.triggerType === "endings" && data.endingIds?.length === 0) {
@@ -452,7 +466,7 @@ export const FollowUpModal = ({
         </DialogHeader>
 
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="contents">
+          <form onSubmit={form.handleSubmit(handleSubmit, handleInvalid)} className="contents">
             <DialogBody className="my-4">
               <div ref={containerRef} className="flex flex-col space-y-4">
                 {/* Follow up name */}
