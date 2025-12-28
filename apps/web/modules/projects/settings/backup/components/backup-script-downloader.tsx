@@ -137,7 +137,7 @@ $dbName = "formbricks"
 
         foreach ($e in $entries) {
           if ($e -eq "database.sql") { $hasDatabaseSql = $true }
-          if ($e -like "minio-data/*") { $hasMinioData = $true }
+          if ($e -match "^minio-data[/\\\\]") { $hasMinioData = $true }
           if ($hasDatabaseSql -and $hasMinioData) { break }
         }
 
@@ -253,6 +253,7 @@ for ($i = 0; $i -lt $backups.Count; $i++) {
   $dbFlag = if ($b.PSObject.Properties.Match('HasDatabaseSql').Count -gt 0 -and $b.HasDatabaseSql) { "db" } else { "no-db" }
   $minioFlag = if ($b.PSObject.Properties.Match('HasMinioData').Count -gt 0 -and $b.HasMinioData) { "files" } else { "no-files" }
   Write-Host "[$i] $($b.Name)  ($($b.LastWriteTime))  [$dbFlag, $minioFlag, $($sizeMb)MB]"
+  Write-Host "    Location: $($b.DirectoryName)" -ForegroundColor DarkGray
 }
 Write-Host ""
 
